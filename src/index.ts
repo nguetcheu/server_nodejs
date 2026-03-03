@@ -1,28 +1,24 @@
-import express, { Application, Request, Response } from 'express';
-import dotenv from 'dotenv';
+import express from 'express';
 import cors from 'cors';
-import helmet from 'helmet';
+import dotenv from 'dotenv';
 import mongoose from 'mongoose';
+import { seedAdmin } from './controllers/authController';
+import authRoutes from './routes/authRoutes';
 
 dotenv.config();
+const app = express();
 
-const app: Application = express();
+app.use(cors());
+app.use(express.json());
+
+app.use('/api/auth', authRoutes);
+
 const PORT = process.env.PORT || 5000;
+mongoose.connect(process.env.MONGO_URI || '')
+  .then(() => {
+    console.log('✅ MongoDB Connecté');
+    seedAdmin();
+  })
+  .catch(err => console.log(err));
 
-app.use(helmet()); 
-app.use(cors());   
-app.use(express.json()); 
-
-const mongoUri = process.env.MONGO_URI || '';
-mongoose
-  .connect(mongoUri)
-  .then(() => console.log('✅ Connecté à MongoDB Atlas'))
-  .catch((err) => console.error('❌ Erreur de connexion MongoDB:', err));
-
-app.get('/', (req: Request, res: Response) => {
-  res.json({ message: 'API EVENTFLOW opérationnelle 🚀' });
-});
-
-app.listen(PORT, () => {
-  console.log(`🚀 Serveur lancé sur : http://localhost:${PORT}`);
-});
+app.listen(PORT, () => console.log(`🚀 Serveur sur le port ${PORT}`));
