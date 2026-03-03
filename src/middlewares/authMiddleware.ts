@@ -48,3 +48,16 @@ export const adminOnly = (
       .json({ message: "Accès refusé : Droits administrateur requis" });
   }
 };
+
+export const isOrganizer = (req: any, res: Response, next: NextFunction) => {
+  if (
+    req.user &&
+    (req.user.role === "organizer" || req.user.role === "admin")
+  ) {
+    next();
+  } else {
+    res
+      .status(403)
+      .json({ message: "Accès refusé : Rôle Organisateur requis" });
+  }
+};
