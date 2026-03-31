@@ -6,6 +6,7 @@ import {
   registerToEvent,
   updateEvent,
   getEventById,
+  unregisterFromEvent,
 } from "../controllers/eventController";
 import { protect, isOrganizer } from "../middlewares/authMiddleware";
 
@@ -15,6 +16,7 @@ router.get("/", getEvents);
 router.get("/:id", getEventById);
 router.post("/", protect, isOrganizer, createEvent);
 router.post("/:id/register", protect, registerToEvent);
+router.post("/:id/unregister", protect, unregisterFromEvent);
 router.put("/:id", protect, isOrganizer, updateEvent);
 router.delete("/:id", protect, deleteEvent);
 

@@ -31,6 +31,28 @@ export const registerToEvent = async (req: any, res: Response) => {
   }
 };
 
+export const unregisterFromEvent = async (req: any, res: Response) => {
+  try {
+    const eventId = req.params.id;
+    const userId = req.user._id;
+
+    const event = await Event.findById(eventId);
+    if (!event) {
+      return res.status(404).json({ message: "Événement non trouvé" });
+    }
+
+    await Event.findByIdAndUpdate(
+      eventId,
+      { $pull: { attendees: userId } },
+      { new: true }
+    );
+
+    res.json({ message: "Vous avez été désinscrit avec succès." });
+  } catch (error: any) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
 export const createEvent = async (req: any, res: Response) => {
   try {
     const { title, description, date, location, capacity, category } = req.body;
