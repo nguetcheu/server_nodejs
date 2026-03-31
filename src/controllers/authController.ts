@@ -10,7 +10,13 @@ const generateToken = (id: any) => {
 
 export const register = async (req: Request, res: Response) => {
   try {
-    const { name, email, password, role } = req.body;
+    const { name, email, password, role, phone, acceptRGPD } = req.body;
+
+    if (!acceptRGPD) {
+      return res.status(400).json({ 
+        message: "Vous devez accepter la politique de confidentialité pour créer un compte." 
+      });
+    }
 
     if (role === "admin") {
       return res.status(403).json({ 
@@ -23,7 +29,14 @@ export const register = async (req: Request, res: Response) => {
       return res.status(400).json({ message: "Email déjà utilisé" });
     }
 
-    const user = await User.create({ name, email, password, role });
+    const user = await User.create({ 
+      name, 
+      email, 
+      password, 
+      role,
+      phone,
+      consent: { accepted: true, date: new Date() } 
+    });
 
     res.status(201).json({
       _id: user._id,
@@ -42,6 +55,11 @@ export const login = async (req: Request, res: Response): Promise<void> => {
     const { email, password } = req.body;
 
     const user = await User.findOne({ email });
+
+    if (user && (user as any).isAnonymized) {
+      res.status(401).json({ message: "Ce compte a été supprimé ou anonymisé." });
+      return;
+    }
 
     if (user && (await (user as any).comparePassword(password))) {
       res.json({

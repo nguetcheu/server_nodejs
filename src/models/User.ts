@@ -7,8 +7,13 @@ export interface IUser extends Document {
   email: string;
   password: string;
   role: "admin" | "organizer" | "participant";
+  phone?: string;
+  isAnonymized: boolean;
+  consent: {
+    accepted: boolean;
+    date: Date;
+  };
 }
-
 
 const UserSchema: Schema = new Schema(
   {
@@ -30,6 +35,12 @@ const UserSchema: Schema = new Schema(
       type: String,
       enum: ["admin", "organizer", "participant"],
       default: "participant",
+    },
+    phone: { type: String, required: false },
+    isAnonymized: { type: Boolean, default: false },
+    consent: {
+      accepted: { type: Boolean, default: false },
+      date: { type: Date, default: Date.now },
     },
   },
   {
