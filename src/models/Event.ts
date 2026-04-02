@@ -8,6 +8,7 @@ export interface IEvent extends Document {
   category: string;
   organizer: mongoose.Types.ObjectId;
   attendees: mongoose.Types.ObjectId[];
+  waitingList: mongoose.Types.ObjectId[];
   capacity: number;
 }
 
@@ -39,6 +40,12 @@ const EventSchema: Schema = new Schema(
       required: true,
     },
     attendees: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User",
+      },
+    ],
+    waitingList: [
       {
         type: mongoose.Schema.Types.ObjectId,
         ref: "User",
