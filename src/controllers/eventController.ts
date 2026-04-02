@@ -31,6 +31,34 @@ export const registerToEvent = async (req: any, res: Response) => {
   }
 };
 
+export const exportAttendeesCSV = async (req: any, res: Response) => {
+  try {
+    const event = await Event.findById(req.params.id).populate("attendees", "name email");
+
+    if (!event) {
+      return res.status(404).json({ message: "Événement non trouvé" });
+    }
+
+    if (event.organizer.toString() !== req.user._id.toString() && req.user.role !== "admin") {
+      return res.status(403).json({ message: "Action non autorisée" });
+    }
+
+    const header = "Nom,Email\n";
+    const rows = event.attendees.map((user: any) => `${user.name},${user.email}`).join("\n");
+    const csvContent = header + rows;
+
+    res.setHeader("Content-Type", "text/csv");
+    res.setHeader(
+      "Content-Disposition", 
+      `attachment; filename=participants-${event.title.replace(/\s+/g, "_")}.csv`
+    );
+
+    res.status(200).send(csvContent);
+  } catch (error: any) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
 export const unregisterFromEvent = async (req: any, res: Response) => {
   try {
     const eventId = req.params.id;

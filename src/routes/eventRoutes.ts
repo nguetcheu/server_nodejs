@@ -7,6 +7,7 @@ import {
   updateEvent,
   getEventById,
   unregisterFromEvent,
+  exportAttendeesCSV,
 } from "../controllers/eventController";
 import { protect, isOrganizer } from "../middlewares/authMiddleware";
 
@@ -14,6 +15,7 @@ const router = express.Router();
 
 router.get("/", getEvents);
 router.get("/:id", getEventById);
+router.get("/:id/export", protect, exportAttendeesCSV);
 router.post("/", protect, isOrganizer, createEvent);
 router.post("/:id/register", protect, registerToEvent);
 router.post("/:id/unregister", protect, unregisterFromEvent);
